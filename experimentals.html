@@ -8,6 +8,10 @@
                 text-align: center;
                 font-size:3em;
             }
+            h2 {
+                text-align: center;
+                font-size: 2em;
+            }
         </style>  
     </head>
     
@@ -31,4 +35,37 @@
                     </li>
                 </ul>
             </nav>
-        </header>   
+        </header>
+    
+        <main>
+            <section>
+                <h2><span style="color:blue;">Experimentals Page with Media Examples</span></h2>
+                <template id="template-for-resume">
+                    <p>Can be later cloned</p>
+                </template>
+
+                <picture>
+                    <source srcset="burak.jpg" type="image/jpg">
+                    <img src="burak.jpg" alt="Photo of Burak and his cat" width="500" height="500" style="border:10px solid #000">
+                </picture>
+                <br>
+                <audio style="border:10px solid #000" controls>
+                    <source src="DC-Horsepower.flac" type="audio/flac">
+                </audio>
+                <br>
+                <video width="500" height="500" style="border:10px solid #000" controls >
+                    <source src="tribe.mp4" type="video/mp4">
+                </video>
+                <br>
+                <canvas id="my-canvas" width="500" height="500" style="border: 10px solid #000;"
+
+            </section>
+        </main>
+        <footer>
+            <p>💯This page was made with &hearts; by Burak 💯</p>
+            <p>HTML Skill:</p>
+            <progress value="50" max="100"></progress>
+        </footer>
+    </body>
+
+</html>
