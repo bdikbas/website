@@ -9,6 +9,16 @@
   <script src="script.js"></script>
 
   <noscript>
+  </noscript>
+  <script>
+    class HelloWorld extends HTMLElement {
+      constructor() {
+        super();
+        console.log("Hello world!");
+      }
+    }
+    customElements.define('hello-world', HelloWorld);
+  </script>
     <style>
       h1 {
         text-align: center;
@@ -21,30 +31,38 @@
       h3 {
         font-size: 1em;
       }
+      fun-image{
+        display: block;
+        width: 500px;
+        height: 500px;
+        margin: 50px auto;
+        background-image: url("burak.jpg");
+        background-size: cover;
+        border-radius: 15px;
+        border: 5px solid #000;
+      }
     </style>
-  </noscript>
+  
 </head>
 
 <body>
   <header>
     <hello-world></hello-world>
-
-    <script>
-      class HelloWorld extends HTMLElement {
-        constructor() {
-          super();
-          console.log("Hello world!");
-        }
-      }
-      customElements.define('hello-world', HelloWorld);
-    </script>
-
     <h1><span style="color:blue;">Burak Dikbas Portfolio</span></h1>
     <nav>
       <ul>
-        <li><a href="about.html">About</a></li>
-        <li><a href="projects.html">Projects</a></li>
-        <li><a href="contact.html">Contact</a></li>
+        <li>
+            <a href="about.html">About</a>
+        </li>
+        <li>
+            <a href="projects.html">Projects</a>
+        </li>
+        <li>
+            <a href="contact.html">Contact</a>
+        </li>
+        <li>
+            <a href="experimentals.html">Experimentals</a>
+        </li>
       </ul>
     </nav>
   </header>
@@ -52,20 +70,7 @@
   <main>
     <section>
       <h2><span style="color:blue;">Persona Diagram</span></h2>
-      <picture>
-        <img src="burak.jpg" alt="Photo of Burak Dikbas" width="250" height="250">
-      </picture>
-
-      <iframe 
-        width="560" 
-        height="315" 
-        src="https://www.youtube.com/embed/zDjkfSKCoAE?si=Y_KJ2KDfWjky2mgY" 
-        title="YouTube video player" 
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-        referrerpolicy="strict-origin-when-cross-origin" 
-        allowfullscreen>
-      </iframe>
-
+      <fun-image></fun-image>
       <article>
         <div style="border:1px solid #000; padding:10px;">
           <h3><b><i><span style="color:blue;">Name:</span></i></b></h3>
@@ -103,8 +108,19 @@
             <li>Be well organized.</li>
             <li>Summaries written with the site being well structured and easy to follow.</li>
           </ol>
+          
         </div>
       </article>
+      <iframe 
+        width="560" 
+        height="315" 
+        src="https://www.youtube.com/embed/zDjkfSKCoAE?si=Y_KJ2KDfWjky2mgY" 
+        title="YouTube video player" 
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+        referrerpolicy="strict-origin-when-cross-origin" 
+        allowfullscreen>
+      </iframe>
+
     </section>
   </main>
 
