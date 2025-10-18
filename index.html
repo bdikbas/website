@@ -25,7 +25,24 @@
 
 <body>
     <header>
+        
+  <hello-world></hello-world>
 
+  <script>
+    
+    class HelloWorld extends HTMLElement {
+      constructor() {
+        super();
+        
+        console.log("Hello world!");
+      }
+    }
+
+    
+    customElements.define('hello-world', HelloWorld);
+  </script>
+
+</body>
         <h1><span style="color:blue;">Burak Dikbas Portfolio</span></h1>
         <nav>
             <ul>
@@ -44,7 +61,7 @@
 
 <main>
     <section>
-        <h2>Persona Diagram</h2>
+        <h2><span style ="color:blue;">Persona Diagram</span></h2>
         <picture>
             <img src="burak.jpg" alt="Photo of Burak Dikbas" width="250" height="250">
           </picture>
