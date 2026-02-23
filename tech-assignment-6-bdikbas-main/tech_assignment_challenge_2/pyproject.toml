@@ -1,0 +1,17 @@
+[project]
+name = "thermal-presence-challenge-2"
+version = "0.1.0"
+description = "TinyML Thermal Presence Detection — Tech Assignment Challenge 2"
+requires-python = ">=3.13"
+dependencies = [
+    "numpy",
+    "pandas",
+    "scikit-learn",
+    "tensorflow",
+    "pytest",
+]
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    "ignore::UserWarning:tensorflow",
+]

@@ -1,0 +1,11 @@
+[project]
+name = "thermal-presence-tutorial"
+version = "0.1.0"
+description = "TinyML Thermal Presence Detection — Lab Tutorial"
+requires-python = ">=3.13"
+dependencies = [
+    "numpy",
+    "pandas",
+    "scikit-learn",
+    "tensorflow",
+]

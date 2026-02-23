@@ -1,0 +1,10 @@
+[project]
+name = "thermal-presence-challenge-1"
+version = "0.1.0"
+description = "TinyML Thermal Presence Detection — Tech Assignment Challenge 1"
+requires-python = ">=3.13"
+dependencies = [
+    "numpy",
+    "pandas",
+    "pytest",
+]
