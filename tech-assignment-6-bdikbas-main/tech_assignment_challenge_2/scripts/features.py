@@ -261,10 +261,10 @@ def engineer_features(df):
     count_above_3 = (pixels > (medians + 3.0)).sum(axis=1).reshape(-1, 1)
     count_above_5 = (pixels > (medians + 5.0)).sum(axis=1).reshape(-1, 1)
 
-    # === Part C: Spatial Features (8 features) ===
+    # Part C: Spatial Features 
     spatial = np.array([compute_spatial_features(row) for row in pixels])
 
-    # === Putting everything together ===
+    # Putting everything together
     X = np.hstack([normalized, row_max, row_range, count_above_3, count_above_5, spatial])
     y = (df["label"].values == "present").astype(np.float32)
 
