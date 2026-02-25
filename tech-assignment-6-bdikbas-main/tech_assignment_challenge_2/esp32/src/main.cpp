@@ -243,7 +243,7 @@ void loop() {
 
     computeFeatures(pixels, features);
     float confidence = runInference(features);
-    bool present = confidence > 0.5f;
+    bool present = confidence >= 0.5f;
 
     String message = "{\"prediction\":\"";
     message += present ? "present" : "empty";
