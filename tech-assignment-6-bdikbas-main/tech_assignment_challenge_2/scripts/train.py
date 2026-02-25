@@ -65,7 +65,16 @@ def build_model(input_dim=76):
     #   Extra Credit:
     #   - Use keras.regularizers.l1_l2(l1=0.005, l2=0.005) instead of l2
     #   - Add Dropout(0.3) after each hidden Dense layer
-    model = None  # Replace with your implementation
+    reg = keras.regularizers.l2(0.005)
+
+    model = keras.Sequential([
+        keras.layers.Input(shape=(input_dim,)),
+        keras.layers.Dense(32, activation="relu", kernel_regularizer=reg),
+        keras.layers.Dense(16, activation="relu", kernel_regularizer=reg),
+        keras.layers.Dense(1, activation="sigmoid"),
+    ])
+
+    model.compile(optimizer="adam", loss="binary_crossentropy", metrics=["accuracy"])
     return model
 
 
@@ -99,9 +108,9 @@ def train_final_model(X, y, groups, n_splits=5):
     #   - Create a StandardScaler
     #   - Fit on X_train and transform X_train -> X_train_scaled
     #   - Transform X_val -> X_val_scaled (do NOT fit on val!)
-    scaler = None  # Replace with your implementation
-    X_train_scaled = None  # Replace with your implementation
-    X_val_scaled = None    # Replace with your implementation
+    scaler = StandardScaler()
+    X_train_scaled = scaler.fit_transform(X_train)
+    X_val_scaled = scaler.transform(X_val)
 
     # TODO A3: Train the model with callbacks
     #   - Build the model using build_model(X.shape[1])
@@ -113,14 +122,46 @@ def train_final_model(X, y, groups, n_splits=5):
     #       validation_data=(X_val_scaled, y_val)
     #       epochs=200, batch_size=32
     #       callbacks=callbacks, verbose=1
-    model = None  # Replace with your implementation
+    model = build_model(X.shape[1])
+
+    callbacks = [
+        keras.callbacks.EarlyStopping(
+            monitor="val_accuracy",
+            patience=20,
+            restore_best_weights=True,
+        ),
+        keras.callbacks.ReduceLROnPlateau(
+            monitor="val_loss",
+            factor=0.5,
+            patience=10,
+            min_lr=1e-6,
+        ),
+    ]
+
+    model.fit(
+        X_train_scaled, y_train,
+        validation_data=(X_val_scaled, y_val),
+        epochs=200,
+        batch_size=32,
+        callbacks=callbacks,
+        verbose=1,
+    )
 
     # TODO A4: Evaluate and print results
     #   - Predict on X_val_scaled (model.predict)
     #   - Threshold at 0.5 to get binary predictions
     #   - Compute accuracy with accuracy_score
     #   - Print classification_report with target_names=["empty", "present"]
-    acc = 0.0  # Replace with your implementation
+    y_prob = model.predict(X_val_scaled, verbose=0).reshape(-1)
+    y_pred = (y_prob >= 0.5).astype(np.float32)
+
+    acc = accuracy_score(y_val, y_pred)
+    print("\nClassification report (held-out fold):")
+    print(classification_report(
+        y_val, y_pred,
+        target_names=["empty", "present"],
+        digits=4
+    ))
 
     # Fit a final scaler on ALL data (for deployment)
     final_scaler = StandardScaler()
@@ -130,11 +171,13 @@ def train_final_model(X, y, groups, n_splits=5):
 
 
 if __name__ == "__main__":
-    df_clean = clean_data("thermal_dataset.csv")
+    csv_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "thermal_dataset.csv"))
+
+    df_clean = clean_data(csv_path)
     X, y = engineer_features(df_clean)
 
     # Need groups for GroupKFold — extract from DataFrame
-    df_clean2 = clean_data("thermal_dataset.csv")
+    df_clean2 = clean_data(csv_path)
     groups = df_clean2["student_id"].values
 
     model, scaler, X_scaled, acc = train_final_model(X, y, groups)

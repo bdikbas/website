@@ -138,13 +138,15 @@ def compute_spatial_features(raw_row):
     # (grid[:, 1:] vs grid[:, :-1]) and vertical neighbors
     # (grid[1:, :] vs grid[:-1, :]). Average the two means.
     # This measures how "sharp" the temperature transitions are.
-    spatial_gradient = 0.0  # Replace with your implementation
+    horiz = np.abs(grid[:, 1:] - grid[:, :-1]).mean()  # 8x7 diffs
+    vert  = np.abs(grid[1:, :] - grid[:-1, :]).mean()  # 7x8 diffs
+    spatial_gradient = 0.5 * (horiz + vert)
 
     # TODO B [REQUIRED]: largest_blob
     # Use your _largest_connected_component function to find the largest
     # connected region of pixels > threshold (4-directional connectivity).
     # A person creates a contiguous warm region; random noise does not.
-    largest_blob = 0  # Replace with your implementation
+    largest_blob = _largest_connected_component(grid, threshold)
 
     # TODO C [REQUIRED]: quadrant_var
     # Split the 8x8 grid into four 4x4 quadrants:
@@ -155,22 +157,35 @@ def compute_spatial_features(raw_row):
     # Compute the mean of each quadrant (4 values).
     # Return the variance of those 4 means.
     # This detects if heat is concentrated in one area vs spread evenly.
-    quadrant_var = 0.0  # Replace with your implementation
+    q_means = np.array([
+        grid[:4, :4].mean(),
+        grid[:4, 4:].mean(),
+        grid[4:, :4].mean(),
+        grid[4:, 4:].mean(),
+    ], dtype=np.float32)
+    quadrant_var = float(np.var(q_means))
+
 
     # TODO D [REQUIRED]: center_vs_edge
     # Compute: mean(center 4x4 region) - mean(outer ring pixels)
     # Center region: rows 2-5, cols 2-5 (i.e., grid[2:6, 2:6])
     # Outer ring: all other pixels (the border)
     # Hint: Use a boolean mask — True for outer, False for center.
-    center_vs_edge = 0.0  # Replace with your implementation
+    center = grid[2:6, 2:6]
+    center_mean = center.mean()
+
+    outer_mask = np.ones((8, 8), dtype=bool)
+    outer_mask[2:6, 2:6] = False
+    edge_mean = grid[outer_mask].mean()
+    center_vs_edge = float(center_mean - edge_mean)
 
     # TODO E [REQUIRED]: row_profile_std and col_profile_std
     # Take the max value in each row → 8 values → compute their std.
     # Do the same for columns.
     # If a person is present, the row/column maxima will vary more
     # (some rows/cols have the person, others don't).
-    row_profile_std = 0.0  # Replace with your implementation
-    col_profile_std = 0.0  # Replace with your implementation
+    row_profile_std = float(np.std(grid.max(axis=1)))
+    col_profile_std = float(np.std(grid.max(axis=0)))
 
     # TODO F [EXTRA CREDIT]: hot_centroid_r and hot_pixel_ratio
     # Find all pixels > threshold ("hot pixels").
@@ -180,8 +195,15 @@ def compute_spatial_features(raw_row):
     # If no hot pixels exist, set hot_centroid_r = 0.
     #
     # Hint: np.where(grid > threshold) returns (row_indices, col_indices)
-    hot_centroid_r = 0.0  # Replace with your implementation
-    hot_pixel_ratio = 0.0  # Replace with your implementation
+    hot_r, hot_c = np.where(grid > threshold)
+    hot_count = hot_r.size
+    hot_pixel_ratio = float(hot_count / 64.0)
+
+    if hot_count == 0:
+        hot_centroid_r = 0.0
+    else:
+        hot_centroid_r = np.sqrt(np.mean((hot_r - 3.5)**2 + (hot_c - 3.5)**2))
+
 
     return np.array([
         spatial_gradient, largest_blob, quadrant_var, center_vs_edge,
@@ -215,9 +237,10 @@ def engineer_features(df):
     #   stds = np.std(pixels, axis=1, keepdims=True)        # shape: (n_samples, 1)
     #   stds[stds < 0.1] = 0.1  # prevent division by zero
     #   normalized = (pixels - medians) / stds              # shape: (n_samples, 64)
-    medians = None   # shape: (n_samples, 1) — Replace with your implementation
-    stds = None      # shape: (n_samples, 1) — Replace with your implementation
-    normalized = None  # shape: (n_samples, 64) — Replace with your implementation
+    medians = np.median(pixels, axis=1, keepdims=True)
+    stds = np.std(pixels, axis=1, keepdims=True)
+    stds[stds < 0.1] = 0.1
+    normalized = (pixels - medians) / stds
 
     # === Part B: Intensity Statistics (4 features) ===
     # These capture "how hot is the hottest pixel" and "how many pixels
@@ -233,10 +256,10 @@ def engineer_features(df):
     #   row_max = pixels.max(axis=1, keepdims=True)
     #   For counts, use boolean comparison:
     #     (pixels > (medians + 3.0)).sum(axis=1).reshape(-1, 1)
-    row_max = None       # Replace with your implementation
-    row_range = None     # Replace with your implementation
-    count_above_3 = None # Replace with your implementation
-    count_above_5 = None # Replace with your implementation
+    row_max = pixels.max(axis=1, keepdims=True)
+    row_range = (pixels.max(axis=1, keepdims=True) - pixels.min(axis=1, keepdims=True))
+    count_above_3 = (pixels > (medians + 3.0)).sum(axis=1).reshape(-1, 1)
+    count_above_5 = (pixels > (medians + 5.0)).sum(axis=1).reshape(-1, 1)
 
     # === Part C: Spatial Features (8 features) ===
     spatial = np.array([compute_spatial_features(row) for row in pixels])
